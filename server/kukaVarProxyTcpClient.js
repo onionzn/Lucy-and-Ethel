@@ -1,6 +1,6 @@
-const Net = require('net');
+import Net from 'net';
 
-class kukaVarProxyTcpClient {
+export class kukaVarProxyTcpClient {
   constructor(ip, port, DEBUG) {
     this.ip = ip;
     this.port = port;
@@ -20,3 +20,5 @@ class kukaVarProxyTcpClient {
   }
   
 }
+
+

@@ -1,4 +1,7 @@
-const kukaVarProxyTcpClient = require('./kukaVarProxyTcpClient.js');
+// const kvp = require('./kukaVarProxyTcpClient.js');
+// const kukaVarProxyTcpClient = require('./kukaVarProxyTcpClient.js');
+import { kukaVarProxyTcpClient } from './kukaVarProxyTcpClient.js';
+
 
 const debugHeader = 'MAIN > ';
 const DEBUG = false;
@@ -9,4 +12,16 @@ let robotLucyIP = '172.31.1.148';
 const kvpPort = 7000;
 
 let kvp = new kukaVarProxyTcpClient(robotEthelIP, kvpPort, DEBUG)
-console.log(debugHeader + await kvp.connectToSocket());
+//await kvp.connectToSocket();
+//console.log(result);
+
+async function test() {
+    try {
+        await kvp.connectToSocket();
+
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+test();
