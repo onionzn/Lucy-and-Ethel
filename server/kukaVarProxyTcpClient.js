@@ -1,4 +1,5 @@
 import Net from 'net';
+import Frame_t from './kukaTypes.js'
 
 export class kukaVarProxyTcpClient {
   constructor(ip, port, DEBUG) {
@@ -9,6 +10,10 @@ export class kukaVarProxyTcpClient {
 
     this.kukaSocket = new Net.Socket();
     this.kukaSocket.setNoDelay(true); // turn off buffering Nagle's
+    
+    // robot motions
+    this.motionQueueSize = 2;
+    this.motionQueueCounter = 0;
   }
 
   async connectToSocket() {
@@ -17,6 +22,19 @@ export class kukaVarProxyTcpClient {
         this.kukaSocket.on('connect', () => { resolve(`connected to kuka socket at ${this.port}:${this.ip}`) });
         setTimeout(() => reject('no connection'), 2000);
     });
+  }
+
+  async moveRobot(){
+    let mode = '#m_LIN';
+    let f = new Frame_t(0,0,0,0,0,0);
+    const r = 5;
+    let motionRequestString = `{ M ${mode} , F {X ${f.X.toFixed(r)}, Y ${f.Y.toFixed(r)}, Z ${f.Z.toFixed(r)} } , COMPLETED FALSE }`;
+    this.requestVariableSet(`COM_MOTION_REQUEST_0`, motionRequestString);
+  }
+
+  requestVariableSet(variable, value) {
+    const message = this.encodeKvpMessage(0, 1, variable, value);
+    this.kukaSocket.write(message);
   }
   
 }

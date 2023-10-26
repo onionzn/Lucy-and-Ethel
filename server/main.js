@@ -24,4 +24,14 @@ async function test() {
     }
 }
 
+async function moveRobotTest() {
+    try {
+        await kvp.moveRobot();
+
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 test();
+moveRobotTest();
