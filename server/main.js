@@ -33,5 +33,5 @@ async function moveRobotTest() {
     }
 }
 
-test();
+setup();
 moveRobotTest();
