@@ -12,11 +12,13 @@ export class kukaVarProxyTcpClient {
   }
 
   async connectToSocket() {
-    this.kukaSocket.connect(this.port, this.ip);
-    return new Promise((resolve, reject) => {
-        this.kukaSocket.on('connect', () => { resolve(`connected to kuka socket at ${this.port}:${this.ip}`) });
-        setTimeout(() => reject('no connection'), 2000);
+    this.kukaSocket.connect(this.port, this.ip, () => {
+      console.log(`Connected to kuka socket at ${this.ip}:${this.port}`);
     });
+    
+    this.kukaSocket.on('error', (error) => {
+      console.log(error);
+    })
   }
   
 }
