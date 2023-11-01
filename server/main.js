@@ -15,7 +15,7 @@ let kvp = new kukaVarProxyTcpClient(robotEthelIP, kvpPort, DEBUG)
 //await kvp.connectToSocket();
 //console.log(result);
 
-async function setup(){
+async function setup() {
     await kvp.connectToSocket();
 }
 

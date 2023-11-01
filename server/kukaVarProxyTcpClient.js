@@ -38,6 +38,43 @@ export class kukaVarProxyTcpClient {
     const message = this.encodeKvpMessage(0, 1, variable, value);
     this.kukaSocket.write(message);
   }
+
+  encodeKvpMessage(messageId, rw, varName, varValue) {
+
+    const _id = this.uint16to8(messageId);
+    const _rw = new Uint8Array([rw]);
+
+    const _varNameAscii = this.encoder.encode(varName);
+    const N = _varNameAscii.length;
+    const _varNameLength = this.uint16to8(N);
+
+    let M = 0;
+    let _varValueAscii;
+    let _varValueLength;
+
+    if (rw === 1) {
+        _varValueAscii = this.encoder.encode(varValue);
+        M = _varValueAscii.length
+        _varValueLength = this.uint16to8(M);
+    }
+
+    const totalLength = (rw === 0) ? 7 + N : 9 + N + M;
+    const contentLength = (rw === 0) ? 3 + N : 5 + N + M;
+
+    const message = new Uint8Array(totalLength);
+    message.set(_id, 0);
+    message.set(this.uint16to8(contentLength), 2);
+    message.set(_rw, 4);
+    message.set(_varNameLength, 5);
+    message.set(_varNameAscii, 7);
+
+    if (rw === 1) {
+        message.set(_varValueLength, 7 + N);
+        message.set(_varValueAscii, 7 + N + 2);
+    }
+
+    return message;
+  }
   
 }
 
