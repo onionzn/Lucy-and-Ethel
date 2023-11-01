@@ -5,7 +5,7 @@
 *********************************/
 
 
-class FRAME_t {
+export class Frame_t {
 
     static positionKeys = ['X', 'Y', 'Z'];
     static angleKeys = ['A', 'B', 'C'];
@@ -76,4 +76,4 @@ class FRAME_t {
     };
 }
 
-module.exports = FRAME_t;
+// module.exports = FRAME_t;

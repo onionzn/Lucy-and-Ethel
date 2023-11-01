@@ -1,5 +1,5 @@
 import Net from 'net';
-import Frame_t from './kukaTypes.js'
+import { Frame_t } from './kukaTypes.js'
 
 export class kukaVarProxyTcpClient {
   constructor(ip, port, DEBUG) {
@@ -19,7 +19,11 @@ export class kukaVarProxyTcpClient {
   async connectToSocket() {
     this.kukaSocket.connect(this.port, this.ip, () => {
       console.log(`Connected to kuka socket at ${this.ip}:${this.port}`);
-    });
+      this.kukaSocket.write("Hello World");
+      this.kukaSocket.on('data', (data) => {console.log('data')});
+    
+    })
+    
     
     this.kukaSocket.on('error', (error) => {
       console.log(error);
@@ -38,6 +42,8 @@ export class kukaVarProxyTcpClient {
     const message = this.encodeKvpMessage(0, 1, variable, value);
     this.kukaSocket.write(message);
   }
+
+
   
 }
 
