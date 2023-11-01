@@ -75,6 +75,13 @@ export class kukaVarProxyTcpClient {
 
     return message;
   }
+
+  uint16to8(uint16) {
+    var ret = new Uint8Array(2);
+    ret[1] = uint16 & 0x00FF;
+    ret[0] = (uint16 & 0xFF00) >> 8;
+    return ret;
+}
   
 }
 
