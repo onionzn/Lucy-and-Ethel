@@ -67,13 +67,14 @@ requestVariableRead(variable) {
     });
   }
 
-  async moveRobot(){
+  async moveRobot(x, y, z, a, b, c){
     let commandModeKukaVar = 'COM_COMMAND_TYPE';
-    // this.requestVariableSet(commandModeKukaVar, '#MOTION');
+    this.requestVariableSet(commandModeKukaVar, '#MOTION');
 
     let mode = '#m_LIN';
 
-    let f = new Frame_t(490, 350, 800, 180, 0, 180);
+    // let f = new Frame_t(490, 350, 820, 180, 0, 180);
+    let f = new Frame_t(x, y, z, a, b, c);
     const r = 5;
     let motionRequestString = `{ M ${mode} , F {X ${f.X.toFixed(r)}, Y ${f.Y.toFixed(r)}, Z ${f.Z.toFixed(r)} }, COMPLETED FALSE }`;
 
