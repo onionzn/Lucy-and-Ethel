@@ -26,7 +26,7 @@ export class kukaVarProxyTcpClient {
       console.log(this.debugHeader + 'robot connected to socket');
       // let request = '<Request><Command>ReadVariable</Command><VariableName>$POS_ACT</VariableName></Request>';
       // this.kukaSocket.write(request);
-      this.requestVariableRead(`$POS_ACT`);
+      // this.requestVariableRead(`$POS_ACT`);
     });
 
     this.kukaSocket.on('error', (err) => {
@@ -35,7 +35,7 @@ export class kukaVarProxyTcpClient {
 
     this.kukaSocket.on('data', async(data) => {
         console.log('I am data!!!');
-        console.log(await data);
+        // console.log(await data);
         let decodedResponse = this.decodeKvpResponse(await data);
         console.log(`Decoded Message`);
         console.log(`Read/Write: ${decodedResponse.rw},\n Response: ${decodedResponse.id},\n Value: ${decodedResponse.value},\n Success?: ${decodedResponse.success},`);
@@ -68,15 +68,25 @@ requestVariableRead(variable) {
   }
 
   async moveRobot(){
+    let commandModeKukaVar = 'COM_COMMAND_TYPE';
+    // this.requestVariableSet(commandModeKukaVar, '#MOTION');
+
     let mode = '#m_LIN';
-    let f = new Frame_t(0,0,0,0,0,0);
+
+    let f = new Frame_t(490, 350, 800, 180, 0, 180);
     const r = 5;
-    let motionRequestString = `{ M ${mode} , F {X ${f.X.toFixed(r)}, Y ${f.Y.toFixed(r)}, Z ${f.Z.toFixed(r)} } , COMPLETED FALSE }`;
-    this.requestVariableSet(`COM_MOTION_REQUEST_0`, motionRequestString);
+    let motionRequestString = `{ M ${mode} , F {X ${f.X.toFixed(r)}, Y ${f.Y.toFixed(r)}, Z ${f.Z.toFixed(r)} }, COMPLETED FALSE }`;
+
+    this.requestVariableSet(`COM_MOTION_REQUEST`, motionRequestString);
+
+    // this.requestVariableSet("$OV_PRO", 10);
+    // this.requestVariableRead("$POS_FOR")
+    // this.requestVariableRead("$POS_ACT");
   }
 
   requestVariableSet(variable, value) {
     const message = this.encodeKvpMessage(0, 1, variable, value);
+    console.log(`message: ${message}`);
     this.kukaSocket.write(message);
   }
 
