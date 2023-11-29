@@ -19,4 +19,16 @@ async function setup() {
     await kvp.connectToSocket();
 }
 
+async function moveRobotTest() {
+    try {
+        await kvp.moveRobot(490, 350, 820, 180, 0, 180);
+        await kvp.moveRobot(400, 340, 820, 180, 0, 180);
+        await kvp.moveRobot(390, 300, 800, 180, 0, 180);
+
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 setup();
+moveRobotTest();

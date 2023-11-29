@@ -1,0 +1,114 @@
+DEF kevinTest()
+
+COM_MOTION_REQUEST_0.COMPLETED = TRUE
+COM_MOTION_REQUEST_1.COMPLETED = TRUE
+COM_MOTION_REQUEST_2.COMPLETED = TRUE
+COM_MOTION_REQUEST_3.COMPLETED = TRUE
+COM_MOTION_REQUEST_4.COMPLETED = TRUE
+
+; initialize some motion request parameters
+COM_MOTION_REQUEST.COMPLETED = TRUE;
+
+
+; initialize internal variables and parameters, includes stuff from the default template (interrupt 3, etc..)
+
+;FOLD INI;%{PE}
+  ;FOLD BASISTECH INI
+    GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+    INTERRUPT ON 3 
+    BAS (#INITMOV,0 )
+  ;ENDFOLD (BASISTECH INI)
+  ;FOLD USER INI
+    ;Make your modifications here
+
+  ;ENDFOLD (USER INI)
+;ENDFOLD (INI)
+
+; potentially here we could update the global variables
+
+
+; go to default home position ; more default stuff
+;FOLD SPTP HOME Vel=100 % DEFAULT ;%{PE}
+  ;FOLD Parameters ;%{h}
+  ;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.spline; Kuka.IsGlobalPoint=False; Kuka.PointName=HOME; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=DEFAULT; Kuka.VelocityPtp=100; Kuka.VelocityFieldEnabled=True; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=SPTP
+  ;ENDFOLD
+  ;SPTP XHOME WITH $VEL_AXIS[1] = SVEL_JOINT(100.0), $TOOL = STOOL2(FHOME), $BASE = SBASE(FHOME.BASE_NO), $IPO_MODE = SIPO_MODE(FHOME.IPO_FRAME), $LOAD = SLOAD(FHOME.TOOL_NO), $ACC_AXIS[1] = SACC_JOINT(PDEFAULT), $APO = SAPO_PTP(PDEFAULT), $GEAR_JERK[1] = SGEAR_JERK(PDEFAULT), $COLLMON_TOL_PRO[1] = USE_CM_PRO_VALUES(0)
+;ENDFOLD
+
+$TOOL = {FRAME: X 0,Y 0,Z 0,A 0,B 0,C 0}
+$ADVANCE = 5 ;Lookahead buffer
+
+; initial PTP movement
+PTP {X 445.094818, Y 313.466888, Z 790.146301, A 179.985474, B 0.0164306853, C 179.989090, S 2, T 35, E1 0.0, E2 0.0, E3 0.0, E4 0.0, E5 0.0, E6 0.0}
+
+; forever
+LOOP 
+
+  SWITCH COM_COMMAND_TYPE 
+  CASE #IDLE
+    ; do nothing yet
+
+  CASE #MOTION
+    IF COM_MOTION_REQUEST.COMPLETED == FALSE THEN
+      SWITCH COM_MOTION_REQUEST.M
+      CASE #m_PTP
+        COM_MOTION_REQUEST.COMPLETED = TRUE
+        PTP COM_MOTION_REQUEST.F 
+      
+      CASE #m_LIN
+        COM_MOTION_REQUEST.COMPLETED = TRUE
+        LIN COM_MOTION_REQUEST.F C_DIS
+
+      CASE #m_LIN_REL
+        COM_MOTION_REQUEST.COMPLETED = TRUE
+        ;LIN COM_MOTION_REQUEST.F
+
+      DEFAULT
+        ; TODO 
+        COM_MOTION_REQUEST.COMPLETED = TRUE
+
+      ENDSWITCH
+    ENDIF 
+
+  CASE #QUEUE_MOTION
+    
+    IF COM_MOTION_REQUEST_0.COMPLETED == FALSE THEN
+        LIN COM_MOTION_REQUEST_0.F C_DIS
+        COM_MOTION_REQUEST_0.COMPLETED = TRUE
+    ENDIF 
+
+    IF COM_MOTION_REQUEST_1.COMPLETED == FALSE THEN
+        LIN COM_MOTION_REQUEST_1.F C_DIS
+        COM_MOTION_REQUEST_1.COMPLETED = TRUE
+    ENDIF 
+
+    IF COM_MOTION_REQUEST_2.COMPLETED == FALSE THEN
+        LIN COM_MOTION_REQUEST_2.F C_DIS
+        COM_MOTION_REQUEST_2.COMPLETED = TRUE
+    ENDIF 
+
+    IF COM_MOTION_REQUEST_3.COMPLETED == FALSE THEN
+        LIN COM_MOTION_REQUEST_3.F C_DIS
+        COM_MOTION_REQUEST_3.COMPLETED = TRUE
+    ENDIF 
+
+    IF COM_MOTION_REQUEST_4.COMPLETED == FALSE THEN
+        LIN COM_MOTION_REQUEST_4.F C_DIS
+        COM_MOTION_REQUEST_4.COMPLETED = TRUE
+    ENDIF 
+
+  CASE #READ_IO
+    ;TODO
+  CASE #WRITE_IO
+    ;TODO
+  CASE #CHANGE_TOOL_FRAME
+    ; TODO
+  DEFAULT
+    ; TODO  
+  
+  ENDSWITCH  
+
+ENDLOOP 
+; so long
+
+END
