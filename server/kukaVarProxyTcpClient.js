@@ -17,8 +17,37 @@ export class kukaVarProxyTcpClient {
 
     //this.decoder = new TextDecoder();
 
+    this.server = Net.createServer((socket) => {
+      console.log('Client connected');
+    
+      // Handle incoming data from the Unity client
+      socket.on('data', (data) => {
+        const receivedData = data.toString();
+        console.log('Received:', receivedData);
+    
+        // Process the received data as needed
+    
+        // Optionally, you can send a response back to the Unity client
+        // const responseMessage = 'Message received by server: ' + receivedData;
+        // socket.write(responseMessage);
+      });
+    
+      // Handle client disconnection
+      socket.on('end', () => {
+        console.log('Client disconnected');
+      });
+    });
+    
+
 
     this.setupTcpSocketCallbacks();
+  }
+
+  startServerForUnity() {
+    const PORT = 3000;
+    this.server.listen(PORT, () => {
+      console.log(`Server listening on port ${PORT}`);
+    });
   }
 
   setupTcpSocketCallbacks() {

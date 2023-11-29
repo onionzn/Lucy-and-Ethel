@@ -16,7 +16,8 @@ let kvp = new kukaVarProxyTcpClient(robotEthelIP, kvpPort, DEBUG)
 //console.log(result);
 
 async function setup() {
-    await kvp.connectToSocket();
+    await kvp.startServerForUnity();
+    // await kvp.connectToSocket();
 }
 
 async function moveRobotTest() {
@@ -31,4 +32,4 @@ async function moveRobotTest() {
 }
 
 setup();
-moveRobotTest();
+// moveRobotTest();
