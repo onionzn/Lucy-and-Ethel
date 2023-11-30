@@ -66,7 +66,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', function (req, res) {
-    res.send(serialData);
+    res.send(serialData["arduino-random"]);
 });
 
 app.get('/device/:deviceId', function(req , res){
@@ -82,7 +82,8 @@ function loadcell(tokens) {
     const datamap = {
         'x': tokens[0],
     };
-    return datamap;
+    // return datamap;
+    return tokens[0].substring(7).trim();
 }
 
 // for KUKA settings
