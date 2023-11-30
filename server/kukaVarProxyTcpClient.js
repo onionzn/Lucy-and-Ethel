@@ -15,17 +15,12 @@ export class kukaVarProxyTcpClient {
     this.motionQueueSize = 2;
     this.motionQueueCounter = 0;
 
-    //this.decoder = new TextDecoder();
-
-
     this.setupTcpSocketCallbacks();
   }
 
   setupTcpSocketCallbacks() {
     this.kukaSocket.on('connect', () => {
       console.log(this.debugHeader + 'robot connected to socket');
-      // let request = '<Request><Command>ReadVariable</Command><VariableName>$POS_ACT</VariableName></Request>';
-      // this.kukaSocket.write(request);
       // this.requestVariableRead(`$POS_ACT`);
     });
 
@@ -35,35 +30,23 @@ export class kukaVarProxyTcpClient {
 
     this.kukaSocket.on('data', async(data) => {
         console.log('I am data!!!');
-        // console.log(await data);
         let decodedResponse = this.decodeKvpResponse(await data);
         console.log(`Decoded Message`);
         console.log(`Read/Write: ${decodedResponse.rw},\n Response: ${decodedResponse.id},\n Value: ${decodedResponse.value},\n Success?: ${decodedResponse.success},`);
         console.log(`Whole Message: ${JSON.stringify(decodedResponse)}`);
         console.log('End of data!!!');
     });
+  }
 
-}
-
-requestVariableRead(variable) {
-  const message = this.encodeKvpMessage(0, 0, variable);
-  console.log(`encoding message ${message}`);
-  //this.messageQueue.push(variable);
-  this.kukaSocket.write(message);
-}
-
-// async connectToSocket() {
-//   this.kukaSocket.connect(this.port, this.ip);
-//   return new Promise((resolve, reject) => {
-//       this.kukaSocket.on('connect', () => { resolve(`connected to kuka socket at ${this.port}:${this.ip}`) });
-//       setTimeout(() => reject('no connection'), 2000);
-//   });
-// }
+  requestVariableRead(variable) {
+    const message = this.encodeKvpMessage(0, 0, variable);
+    console.log(`encoding message ${message}`);
+    this.kukaSocket.write(message);
+  }
 
   async connectToSocket() {
     await this.kukaSocket.connect(this.port, this.ip, () => {
       console.log(`Connected to kuka socket at ${this.ip}:${this.port}`);
-      //this.kukaSocket.write("Hello World");
     });
   }
 
@@ -73,16 +56,11 @@ requestVariableRead(variable) {
 
     let mode = '#m_LIN';
 
-    // let f = new Frame_t(490, 350, 820, 180, 0, 180);
     let f = new Frame_t(x, y, z, a, b, c);
     const r = 5;
     let motionRequestString = `{ M ${mode} , F {X ${f.X.toFixed(r)}, Y ${f.Y.toFixed(r)}, Z ${f.Z.toFixed(r)} }, COMPLETED FALSE }`;
 
     this.requestVariableSet(`COM_MOTION_REQUEST`, motionRequestString);
-
-    // this.requestVariableSet("$OV_PRO", 10);
-    // this.requestVariableRead("$POS_FOR")
-    // this.requestVariableRead("$POS_ACT");
   }
 
   requestVariableSet(variable, value) {
@@ -146,9 +124,7 @@ requestVariableRead(variable) {
     message.success = (_tail[0] === 0 && _tail[1] === 1 && _tail[2] === 1) ? true : false;
 
     return message;
-    // TODO and check against python
-
-}
+  }
 
   uint8toNumber(a) {
     const lsb = a[1];
@@ -162,8 +138,6 @@ requestVariableRead(variable) {
       ret[0] = (uint16 & 0xFF00) >> 8;
       return ret;
   }
-  
-  
 }
 
 
