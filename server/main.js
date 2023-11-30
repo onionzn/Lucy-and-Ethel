@@ -123,15 +123,17 @@ const platePositions = [platePosition0, platePosition1, platePosition2];
 let platePositionIndex = 0;
 
 // Move KUKA to the starting position
-kvp.moveRobot(platePosition0.X, platePosition0.Y, platePosition0.Z, platePosition0.A, platePosition0.B, platePosition0.C);
+// kvp.moveRobot(platePosition0.X, platePosition0.Y, platePosition0.Z, platePosition0.A, platePosition0.B, platePosition0.C);
 
 // Express endpoint to handle POST request from Unity signaling a successful hit
 app.post('/hit', function(req, res) {
     const hit = req.body.hit;
-    if (hit) {
+    // console.log(hit);
+    if (hit === 'True') {
         platePositionIndex += 1;
         // End the user journey if all plates have been hit
         if (platePositionIndex >= numberOfPlates) {
+            console.log("End of user journey");
             res.send("End of user journey");
             return;
         }
@@ -139,9 +141,11 @@ app.post('/hit', function(req, res) {
         // Advance KUKA to the next predefined position
         const nextPosition = platePositions[platePositionIndex];
         console.log(`Before moving to postition at index ${platePositionIndex}`);
-        kvp.moveRobot(nextPosition.X, nextPosition.Y, nextPosition.Z, nextPosition.A, nextPosition.B, nextPosition.C);
+        // kvp.moveRobot(nextPosition.X, nextPosition.Y, nextPosition.Z, nextPosition.A, nextPosition.B, nextPosition.C);
+        console.log("Moved to next position");
         res.send("Moved to next position");
     } else {
+        console.log("Not a hit");
         res.send("Not a hit");
     }
 })
