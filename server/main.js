@@ -40,12 +40,12 @@ for (const deviceId in deviceDefs) {
 
                 const parser = serialPort[key].pipe(new ReadlineParser({ delimiter: '\r\n' }));
                 parser.on('data', (data) => {
-                    var parser = 'parse2'
+                    var parser = 'parse2';
                     if ('parser' in deviceDef) {
                         parser = deviceDef['parser'];
                     }
-                    tokens = data.split(",");
-                    datamap = eval(`${parser}(tokens)`);
+                    const tokens = data.split(",");
+                    const datamap = eval(`${parser}(tokens)`);
                     serialData[key] = datamap;
                 });
             } catch (err) {
@@ -79,7 +79,7 @@ app.listen(8000, '0.0.0.0', function() {
 
 // Parser for values from device "loadcell"
 function loadcell(tokens) {
-    datamap = {
+    const datamap = {
         'x': tokens[0],
     };
     return datamap;
