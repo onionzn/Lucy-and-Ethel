@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Events;
+using System.Linq;
 
 [System.Serializable]
 public class ReceiveDataEvent : UnityEvent<string> {}
 
 [System.Serializable]
-public class ReadFromServerEvent : UnityEvent {}
+public class LevelManagerEvent : UnityEvent {}
 
-public class ReadFromServer : MonoBehaviour
+public class LevelManager : MonoBehaviour
 {
     public string url = "http://localhost:8000";
     public float requestInterval = 0.5f;
@@ -20,18 +21,52 @@ public class ReadFromServer : MonoBehaviour
         get { return _requestRate; }
     }
 
+    public GameObject plate;
+    public string[] platePositions = new string[]{
+        "358,567,743,90,0,180",
+        "33.8,567,743,90,0,180",
+        "-278,567,743,90,0,180",
+    };
+    private int plateIdx = 0;
     public ReceiveDataEvent OnReceiveData;
-    public ReadFromServerEvent OnSlowdown;
-    private float ButtonThreshold = 100.0f;
+    public LevelManagerEvent OnSlowdown;
+    private float ButtonThreshold = -30.0f;
+
+    private float prevValue = -1000.0f;
+
+    private bool isValid(float value) {
+        return value >= ButtonThreshold;
+    }
+
+    void SetPlatePosition(string pos)
+    {
+        float[] posValues = pos.Split(",").Select(s => float.Parse(s.Trim())).ToArray();
+        plate.transform.position = new Vector3(posValues[0] / 1000, posValues[2] / 1000, posValues[1] / 1000);
+        plate.transform.eulerAngles = new Vector3(90f, 0f, 0f);
+    }
 
     // Start is called before the first frame update
     void Start() {
+        SetPlatePosition(platePositions[0]);
+
         StartCoroutine(ContinuousRequest());
 
         OnReceiveData.AddListener((data) => {
-            Debug.Log($"Recv Data: {data} at rate .");
+            // Debug.Log($"Recv Data: {data} at rate .");
             float value = float.Parse(data);
-            SignalKukaMovement(value);
+            
+            // Move KUKA after detecting a release
+            if (isValid(prevValue) && !isValid(value)) {
+                Debug.Log($"Detected a release! {prevValue}");
+                plateIdx += 1;
+                if (plateIdx < platePositions.Length)
+                {                
+                    SignalKukaMovement();
+                    SignalPlateMovement();
+                }
+            }
+
+            prevValue = value;
         });
 
         OnSlowdown.AddListener(() => {
@@ -39,15 +74,17 @@ public class ReadFromServer : MonoBehaviour
         });
     }
 
-    private void SignalKukaMovement(float value) {
-        bool hit = false;
-        if (value > ButtonThreshold) {
-            hit = true;
-        }
+    private void SignalPlateMovement()
+    {
+        string currPos = platePositions[plateIdx];
+        SetPlatePosition(currPos);
+    }
 
+    private void SignalKukaMovement() {
         // Create a form to send data in the request body
         WWWForm form = new WWWForm();
-        form.AddField("hit", hit.ToString());
+        form.AddField("hit", "True");
+        form.AddField("position", platePositions[plateIdx]);
 
         // Create a POST request to signal a hit to the KVP client
         string hitUrl = "http://localhost:8000/hit";
