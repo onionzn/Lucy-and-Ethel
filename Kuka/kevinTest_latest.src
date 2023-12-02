@@ -39,7 +39,7 @@ $TOOL = {FRAME: X 0,Y 0,Z 0,A 0,B 0,C 0}
 $ADVANCE = 5 ;Lookahead buffer
 
 ; initial PTP movement
-PTP {X 445.094818, Y 313.466888, Z 790.146301, A 179.985474, B 0.0164306853, C 179.989090, S 2, T 35, E1 0.0, E2 0.0, E3 0.0, E4 0.0, E5 0.0, E6 0.0}
+PTP {X 400, Y 567, Z 743, A 90, B 0, C 180, S 2, T 35, E1 0.0, E2 0.0, E3 0.0, E4 0.0, E5 0.0, E6 0.0}
 
 ; forever
 LOOP 

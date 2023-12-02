@@ -22,15 +22,11 @@ public class LevelManager : MonoBehaviour
     }
 
     public GameObject plate;
-    public string[] platePositions = new string[]{
-        "358,567,743,90,0,180",
-        "33.8,567,743,90,0,180",
-        "-278,567,743,90,0,180",
-    };
+    public string[] platePositions;
     private int plateIdx = 0;
     public ReceiveDataEvent OnReceiveData;
     public LevelManagerEvent OnSlowdown;
-    private float ButtonThreshold = -30.0f;
+    private float ButtonThreshold = 20.0f;
 
     private float prevValue = -1000.0f;
 
@@ -41,13 +37,14 @@ public class LevelManager : MonoBehaviour
     void SetPlatePosition(string pos)
     {
         float[] posValues = pos.Split(",").Select(s => float.Parse(s.Trim())).ToArray();
-        plate.transform.position = new Vector3(posValues[0] / 1000, posValues[2] / 1000, posValues[1] / 1000);
-        plate.transform.eulerAngles = new Vector3(90f, 0f, 0f);
+        plate.transform.localPosition = new Vector3(posValues[0] / 1000 + 0.18415f, posValues[2] / 1000 - 0.80645f, posValues[1] / 1000 - 0.04f);
+        // plate.transform.eulerAngles = new Vector3(90f, 0f, 0f);
     }
 
     // Start is called before the first frame update
     void Start() {
         SetPlatePosition(platePositions[0]);
+        SignalKukaMovement();
 
         StartCoroutine(ContinuousRequest());
 
@@ -60,7 +57,7 @@ public class LevelManager : MonoBehaviour
                 Debug.Log($"Detected a release! {prevValue}");
                 plateIdx += 1;
                 if (plateIdx < platePositions.Length)
-                {                
+                {
                     SignalKukaMovement();
                     SignalPlateMovement();
                 }
@@ -78,16 +75,22 @@ public class LevelManager : MonoBehaviour
     {
         string currPos = platePositions[plateIdx];
         SetPlatePosition(currPos);
+        plate.SetActive(false);
+        Invoke("SetActivePlateDelayed", 2f);
+    }
+
+    void SetActivePlateDelayed()
+    {
+        plate.SetActive(true);
     }
 
     private void SignalKukaMovement() {
         // Create a form to send data in the request body
         WWWForm form = new WWWForm();
-        form.AddField("hit", "True");
         form.AddField("position", platePositions[plateIdx]);
 
         // Create a POST request to signal a hit to the KVP client
-        string hitUrl = "http://localhost:8000/hit";
+        string hitUrl = "http://localhost:8000/move";
         UnityWebRequest webRequest = UnityWebRequest.Post(hitUrl, form);
         
         // Send the POST request

@@ -50,17 +50,38 @@ export class kukaVarProxyTcpClient {
     });
   }
 
+  xWithInBoundary(x) {
+    if(x > -300 && x <=400) return true;
+    else return false;
+  }
+
+  yWithInBoundary(y) {
+    if(y > 510 && y < 570) return true;
+    else return false;
+  }
+
+  zWithInBoundary(z) {
+    if(z > 600 && z < 880) return true;
+    else return false;
+  }
+
   async moveRobot(x, y, z, a, b, c){
-    let commandModeKukaVar = 'COM_COMMAND_TYPE';
-    this.requestVariableSet(commandModeKukaVar, '#MOTION');
+    if(this.xWithInBoundary(x) && this.yWithInBoundary(y) && this.zWithInBoundary(z)){
+      let commandModeKukaVar = 'COM_COMMAND_TYPE';
+      this.requestVariableSet(commandModeKukaVar, '#MOTION');
 
-    let mode = '#m_LIN';
+      let mode = '#m_LIN';
 
-    let f = new Frame_t(x, y, z, a, b, c);
-    const r = 5;
-    let motionRequestString = `{ M ${mode} , F {X ${f.X.toFixed(r)}, Y ${f.Y.toFixed(r)}, Z ${f.Z.toFixed(r)} }, COMPLETED FALSE }`;
+      let f = new Frame_t(x, y, z, a, b, c);
+      const r = 5;
+      let motionRequestString = `{ M ${mode} , F {X ${f.X.toFixed(r)}, Y ${f.Y.toFixed(r)}, Z ${f.Z.toFixed(r)} }, COMPLETED FALSE }`;
 
-    this.requestVariableSet(`COM_MOTION_REQUEST`, motionRequestString);
+      this.requestVariableSet(`COM_MOTION_REQUEST`, motionRequestString);
+    }
+    else{
+      console.log("Out of boundary");
+    }
+    
   }
 
   requestVariableSet(variable, value) {
