@@ -22,6 +22,7 @@ public class LevelManager : MonoBehaviour
     }
 
     public GameObject plate;
+    public GameObject breakingPlate;
     public string[] platePositions;
     private int plateIdx = 0;
     public ReceiveDataEvent OnReceiveData;
@@ -73,10 +74,20 @@ public class LevelManager : MonoBehaviour
 
     private void SignalPlateMovement()
     {
+        plate.SetActive(false);
+        // Simulate breaking plates with broken plate asset
+        Instantiate(breakingPlate, plate.transform.position, plate.transform.rotation);
+        // Destroy broken plates after 2 seconds
+        Invoke("DestroyBrokenPlates", 2f);
+
         string currPos = platePositions[plateIdx];
         SetPlatePosition(currPos);
-        plate.SetActive(false);
         Invoke("SetActivePlateDelayed", 2f);
+    }
+
+    void DestroyBrokenPlates()
+    {
+        Destroy(breakingPlate);
     }
 
     void SetActivePlateDelayed()
